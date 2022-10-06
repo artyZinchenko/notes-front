@@ -3,6 +3,9 @@ import { useState, useEffect, useRef } from 'react'
 
 import noteService from './services/notes'
 import Notification from './components/Notification'
+import { ThemeProvider } from 'styled-components'
+import GlobalStyles from './components/styles/Global'
+import Header from './components/Header'
 import Footer from './components/Footer'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
@@ -12,6 +15,16 @@ import Filter from './components/Filter'
 import NotesList from './components/NotesList'
 import { initializeNotes } from './reducers/notesReducer'
 import { useDispatch } from 'react-redux'
+
+import { Container } from './components/styles/Container.styled'
+
+const theme = {
+  colors: {
+    header: '#ebfbff',
+    body: '#fff',
+    footer: '#003333',
+  },
+}
 
 const App = () => {
   const dispatch = useDispatch()
@@ -47,34 +60,29 @@ const App = () => {
     }
   }
 
-  // const addNote = (noteObject) => {
-  //   noteFormRef.current.toggleVisibility()
-  //   noteService.create(noteObject).then((responce) => {
-  //     setNotes(notes.concat(responce))
-  //   })
-  // }
-
   return (
-    <div>
-      <h1>Notes</h1>
-
-      <Notification message={errorMessage} />
-      {user === null ? (
-        <Togglable buttonLabel='login'>
-          <LoginForm handleLogin={handleLogin} />
-        </Togglable>
-      ) : (
-        <div>
-          <p>{user.name} logged-in</p>
-          <Togglable buttonLabel='new Note' ref={noteFormRef}>
-            <NoteForm />
+    <ThemeProvider theme={theme}>
+      <GlobalStyles />
+      <Header />
+      <Container>
+        <Notification message={errorMessage} />
+        {user === null ? (
+          <Togglable buttonLabel='login'>
+            <LoginForm handleLogin={handleLogin} />
           </Togglable>
-        </div>
-      )}
-      <Filter />
-      <NotesList />
-      <Footer />
-    </div>
+        ) : (
+          <div>
+            <p>{user.name} logged-in</p>
+            <Togglable buttonLabel='new Note' ref={noteFormRef}>
+              <NoteForm />
+            </Togglable>
+          </div>
+        )}
+        <Filter />
+        <NotesList />
+        <Footer />
+      </Container>
+    </ThemeProvider>
   )
 }
 

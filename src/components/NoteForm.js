@@ -11,9 +11,9 @@ const NoteForm = () => {
     const noteContent = event.target.note.value
     event.target.note.value = ''
     const newNote = { content: noteContent, important: false }
-    console.log(newNote)
+
     const response = await notesServices.create(newNote)
-    console.log(response)
+
     dispatch(addNoteToStore(response))
   }
 
