@@ -7,7 +7,7 @@ export const StyledHeader = styled.header`
 
 export const Nav = styled.nav`
   display: flex;
-  aligh-items: center;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: space-around;
   margin-bottom: 40px;
 `

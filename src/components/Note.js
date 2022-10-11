@@ -1,12 +1,12 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
-const Note = ({ note, toggleImportance, deleteNote }) => {
-  const label = note.important ? 'make not important' : 'make important'
+const Note = ({ note }) => {
   return (
     <li className='note'>
-      <span>{note.content}</span>
-      <button onClick={toggleImportance}>{label}</button>{' '}
-      <button onClick={deleteNote}>delete</button>
+      <Link to={`/notes/${note.id}`}>
+        <span>{note.content}</span>
+      </Link>
     </li>
   )
 }

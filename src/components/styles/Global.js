@@ -15,6 +15,10 @@ const GlobalStyles = createGlobalStyle`
     margin: 0;
   }
 
+  h1{
+    max-width: fit-content;
+  }
+
   p {
     opacity: 0.6;
     line-height: 1.5;
@@ -23,5 +27,11 @@ const GlobalStyles = createGlobalStyle`
   img {
     max-width: 100%;
   }
+
+  a {
+  color: inherit; 
+  text-decoration: inherit; 
+}
+
 `
 export default GlobalStyles

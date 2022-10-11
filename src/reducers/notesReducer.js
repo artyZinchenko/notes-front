@@ -8,7 +8,7 @@ const notesSlice = createSlice({
     setNotes(state, action) {
       return action.payload
     },
-    toggleImportance(state, action) {
+    modifyNote(state, action) {
       const changedNote = action.payload
       return state.map((note) =>
         note.id === changedNote.id ? changedNote : note
@@ -36,6 +36,6 @@ export const initializeNotes = () => {
 //   return asy
 // }
 
-export const { setNotes, toggleImportance, deleteFromStore, addNoteToStore } =
+export const { setNotes, modifyNote, deleteFromStore, addNoteToStore } =
   notesSlice.actions
 export default notesSlice.reducer

@@ -1,5 +1,6 @@
 import React from 'react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
+import { Route, Routes, useMatch, Link } from 'react-router-dom'
 
 import noteService from './services/notes'
 import Notification from './components/Notification'
@@ -8,11 +9,11 @@ import GlobalStyles from './components/styles/Global'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import loginService from './services/login'
-import LoginForm from './components/LoginForm'
 import NoteForm from './components/NoteForm'
-import Togglable from './components/Togglable'
 import Filter from './components/Filter'
 import NotesList from './components/NotesList'
+import DetailedNote from './components/DetailedNote'
+
 import { initializeNotes } from './reducers/notesReducer'
 import { useDispatch } from 'react-redux'
 
@@ -44,9 +45,7 @@ const App = () => {
       setUser(user)
       noteService.setToken(user.token)
     }
-  }, [])
-
-  const noteFormRef = useRef()
+  }, [dispatch])
 
   const handleLogin = async (credentials) => {
     try {
@@ -60,26 +59,34 @@ const App = () => {
     }
   }
 
+  const match = useMatch('/notes/:id')
+  const matchedNoteId = match ? match.params.id : null
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
-      <Header />
+      <Header handleLogin={handleLogin} user={user} />
       <Container>
         <Notification message={errorMessage} />
-        {user === null ? (
-          <Togglable buttonLabel='login'>
-            <LoginForm handleLogin={handleLogin} />
-          </Togglable>
-        ) : (
-          <div>
-            <p>{user.name} logged-in</p>
-            <Togglable buttonLabel='new Note' ref={noteFormRef}>
-              <NoteForm />
-            </Togglable>
-          </div>
-        )}
-        <Filter />
-        <NotesList />
+        <Routes>
+          <Route
+            path='/'
+            element={
+              <>
+                <Link to='/create'>
+                  <button>Create new note</button>
+                </Link>
+                <Filter />
+                <NotesList />
+              </>
+            }
+          />
+          <Route
+            path='/notes/:id'
+            element={<DetailedNote matchedNoteId={matchedNoteId} />}
+          />
+          <Route path='/create' element={<NoteForm />} />
+        </Routes>
         <Footer />
       </Container>
     </ThemeProvider>
