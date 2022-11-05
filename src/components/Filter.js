@@ -1,45 +1,48 @@
-/* eslint-disable jsx-a11y/label-has-for */
-/* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormControl from '@mui/material/FormControl'
 import { useDispatch } from 'react-redux'
 import { setFilter } from '../reducers/filterReducer'
+import { useEffect } from 'react'
 
 const Filter = () => {
   const dispatch = useDispatch()
+  const [value, setValue] = React.useState('ALL')
 
-  const filterSelected = (filter) => {
-    dispatch(setFilter(filter))
+  useEffect(() => {
+    setValue('ALL')
+  }, [])
+
+  const handleChange = (event) => {
+    const newValue = event.target.value
+    setValue(newValue)
+    dispatch(setFilter(newValue))
   }
 
   return (
-    <div>
-      <label>
-        <input
-          type='radio'
-          name='filter'
-          onChange={() => filterSelected('ALL')}
-          // eslint-disable-next-line react/no-unknown-property
+    <FormControl>
+      <RadioGroup
+        row
+        aria-labelledby='row-radio-buttons-group-label'
+        name='row-radio-buttons-group'
+        value={value}
+        onChange={handleChange}
+      >
+        <FormControlLabel
+          value='ALL'
+          control={<Radio />}
+          label='all'
           defaultChecked
         />
-        all{'  '}
-      </label>
-      <label>
-        <input
-          type='radio'
-          name='filter'
-          onChange={() => filterSelected('IMPORTANT')}
+        <FormControlLabel
+          value='IMPORTANT'
+          control={<Radio />}
+          label='important'
         />
-        important{'  '}
-      </label>
-      <label>
-        <input
-          type='radio'
-          name='filter'
-          onChange={() => filterSelected('NONIMPORTANT')}
-        />
-        not important{' '}
-      </label>
-    </div>
+      </RadioGroup>
+    </FormControl>
   )
 }
 

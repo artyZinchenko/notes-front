@@ -2,7 +2,7 @@ import React from 'react'
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import Togglable from './Togglable'
+import Togglable from '../components/Togglable'
 
 // npm test -- src/components/Togglable.test.js
 

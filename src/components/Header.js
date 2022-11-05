@@ -1,28 +1,103 @@
 import React from 'react'
-import { StyledHeader } from './styles/Header.styled'
-import { Container } from './styles/Container.styled'
-import Togglable from './Togglable'
-import LoginForm from './LoginForm'
+import styled from 'styled-components'
+import AppBar from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
 
-const Header = ({ handleLogin, user }) => {
-  console.log(user)
+import { Box } from '@mui/system'
+import { useNavigate } from 'react-router-dom'
+import ModeSwitchButton from './ModeSwitchButton'
+import { StyledButtonMainReverse } from './styles/Buttons.styled'
+import HistoryEduOutlinedIcon from '@mui/icons-material/HistoryEduOutlined'
+import useMediaQuery from '@mui/material/useMediaQuery'
+
+const StyledHeader = styled(AppBar)({
+  minHeight: '11vh',
+  backgroundColor: ({ theme }) => theme.palette.background.header,
+  color: ({ theme }) => theme.palette.text.primary,
+  padding: '20px 0',
+  '& .css-i4bv87-MuiSvgIcon-root': {
+    height: '1em',
+    width: '1em',
+  },
+})
+
+const NoteIcon = styled(HistoryEduOutlinedIcon)({
+  color: ({ theme }) => theme.palette.niceColor.blue,
+})
+
+const StyledTypography = styled(Typography)({
+  opacity: '0.6',
+  whiteSpace: 'nowrap',
+})
+
+const Header = ({ user, setUser, setTheme, theme }) => {
+  const navigate = useNavigate()
+  const matches = useMediaQuery('(min-width:600px)')
+
+  const handleLogOut = () => {
+    if (confirm('Do you want to log out?')) {
+      setUser(null)
+      window.localStorage.removeItem('loggedNoteappUser')
+      navigate('/')
+    }
+  }
   return (
-    <Container>
-      <StyledHeader>
-        <div>
-          <h1>Notes</h1>
-        </div>
-        <div>
-          {user ? (
-            <p>{user.username} logged-in</p>
-          ) : (
-            <Togglable buttonLabel='login'>
-              <LoginForm handleLogin={handleLogin} />
-            </Togglable>
+    <StyledHeader position='static'>
+      <Toolbar
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignContent: 'center',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            flexWrap: 'nowrap',
+          }}
+        >
+          <NoteIcon fontSize='large' />
+          {matches && (
+            <Typography variant='h5' color='#3b82f6'>
+              NotesApp
+            </Typography>
           )}
-        </div>
-      </StyledHeader>
-    </Container>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            paddingTop: '4px',
+            gap: '20px',
+          }}
+        >
+          {user && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'baseline',
+                paddingTop: '4px',
+                gap: '20px',
+              }}
+            >
+              <StyledTypography variant='subtitle1'>
+                {user.username} logged-in
+              </StyledTypography>
+              <StyledButtonMainReverse
+                onClick={handleLogOut}
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                log out
+              </StyledButtonMainReverse>
+            </Box>
+          )}
+          <ModeSwitchButton setTheme={setTheme} theme={theme} />
+        </Box>
+      </Toolbar>
+    </StyledHeader>
   )
 }
 

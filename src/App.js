@@ -1,41 +1,44 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { Route, Routes, useMatch, Link } from 'react-router-dom'
+import { Route, Routes, useMatch, useNavigate } from 'react-router-dom'
 
 import noteService from './services/notes'
 import Notification from './components/Notification'
 import { ThemeProvider } from 'styled-components'
 import GlobalStyles from './components/styles/Global'
+import { darkTheme, lightTheme } from './components/styles/Themes'
+import { StyledEngineProvider } from '@mui/material/styles'
+
 import Header from './components/Header'
 import Footer from './components/Footer'
 import loginService from './services/login'
+import userService from './services/users'
 import NoteForm from './components/NoteForm'
-import Filter from './components/Filter'
+
 import NotesList from './components/NotesList'
 import DetailedNote from './components/DetailedNote'
+import LoginPage from './components/LoginPage'
+import ProtectedRoute from './components/ProtectedRoute'
+import Controls from './components/Controls'
 
 import { initializeNotes } from './reducers/notesReducer'
 import { useDispatch } from 'react-redux'
 
-import { Container } from './components/styles/Container.styled'
-
-const theme = {
-  colors: {
-    header: '#ebfbff',
-    body: '#fff',
-    footer: '#003333',
-  },
-}
+import { Box } from '@mui/system'
+import { Container } from '@mui/material'
+import HomePage from './components/HomePage'
+import NotificationContext from './context/NotificationContext'
+import SignUp from './components/SignUpPage'
 
 const App = () => {
+  const inputGlobalStyles = <GlobalStyles />
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [theme, setTheme] = useState('light')
+  const [notification, setNotification] = useState(null)
   const [user, setUser] = useState(null)
-
-  useEffect(() => {
-    dispatch(initializeNotes()), [dispatch]
-  })
+  const value = { notification, setNotification }
 
   useEffect(() => {
     const loggedUserJSON = localStorage.getItem('loggedNoteappUser')
@@ -45,7 +48,26 @@ const App = () => {
       setUser(user)
       noteService.setToken(user.token)
     }
-  }, [dispatch])
+  }, [])
+
+  useEffect(() => {
+    const currentTheme = localStorage.getItem('notesAppTheme')
+
+    if (currentTheme) {
+      setTheme(currentTheme)
+    }
+  })
+
+  useEffect(() => {
+    if (user) {
+      try {
+        dispatch(initializeNotes()), [dispatch]
+      } catch (exception) {
+        setNotification({ type: 'error', text: exception })
+        setTimeout(() => setNotification(null), 5000)
+      }
+    }
+  }, [user])
 
   const handleLogin = async (credentials) => {
     try {
@@ -53,9 +75,29 @@ const App = () => {
       setUser(user)
       window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
       noteService.setToken(user.token)
+      setNotification({
+        text: `${credentials.username} logged in `,
+        type: 'success',
+      })
+      setTimeout(() => setNotification(null), 5000)
+      navigate('/notes')
     } catch (exception) {
-      setErrorMessage('Wrong Credentials')
-      setTimeout(() => setErrorMessage(null), 5000)
+      setNotification({ type: 'error', text: exception })
+      setTimeout(() => setNotification(null), 3000)
+    }
+  }
+
+  const handleSignup = async (credentials) => {
+    try {
+      await userService.createUser(credentials)
+      setNotification({
+        text: `${credentials.username}'s account created `,
+        type: 'success',
+      })
+      setTimeout(() => setNotification(null), 5000)
+    } catch (exception) {
+      setNotification({ type: 'error', text: exception })
+      setTimeout(() => setNotification(null), 3000)
     }
   }
 
@@ -63,33 +105,65 @@ const App = () => {
   const matchedNoteId = match ? match.params.id : null
 
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyles />
-      <Header handleLogin={handleLogin} user={user} />
-      <Container>
-        <Notification message={errorMessage} />
-        <Routes>
-          <Route
-            path='/'
-            element={
-              <>
-                <Link to='/create'>
-                  <button>Create new note</button>
-                </Link>
-                <Filter />
-                <NotesList />
-              </>
-            }
-          />
-          <Route
-            path='/notes/:id'
-            element={<DetailedNote matchedNoteId={matchedNoteId} />}
-          />
-          <Route path='/create' element={<NoteForm />} />
-        </Routes>
-        <Footer />
-      </Container>
-    </ThemeProvider>
+    <StyledEngineProvider injectFirst>
+      <NotificationContext.Provider value={value}>
+        <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+          {inputGlobalStyles}
+          <Box
+            sx={{
+              minHeight: '100vh',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Header
+              setUser={setUser}
+              user={user}
+              setTheme={setTheme}
+              theme={theme}
+            />
+            <Container sx={{ minHeight: '70vh' }}>
+              <Notification notification={notification} />
+
+              <Routes>
+                <Route path='/' element={<HomePage user={user} />} />
+                <Route
+                  path='/login'
+                  element={<LoginPage handleLogin={handleLogin} />}
+                />
+                <Route
+                  path='/signup'
+                  element={
+                    <SignUp
+                      handleLogin={handleLogin}
+                      handleSignup={handleSignup}
+                    />
+                  }
+                />
+                <Route element={<ProtectedRoute user={user} />}>
+                  <Route
+                    path='/notes'
+                    element={
+                      <>
+                        <Controls />
+                        <NotesList />
+                      </>
+                    }
+                  />
+                  <Route
+                    path='/notes/:id'
+                    element={<DetailedNote matchedNoteId={matchedNoteId} />}
+                  />
+                  <Route path='/create' element={<NoteForm />} />
+                </Route>
+              </Routes>
+            </Container>
+            <Footer />
+          </Box>
+        </ThemeProvider>
+      </NotificationContext.Provider>
+    </StyledEngineProvider>
   )
 }
 

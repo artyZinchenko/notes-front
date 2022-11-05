@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
-import NoteForm from './NoteForm'
+import NoteForm from '../components/NoteForm'
 
 // npm test -- src/components/NoteForm.test.js
 

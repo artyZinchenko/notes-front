@@ -1,41 +1,59 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import notesServices from '../services/notes'
 import { useDispatch } from 'react-redux'
 import { addNoteToStore } from '../reducers/notesReducer'
 import { useNavigate } from 'react-router-dom'
+import Box from '@mui/material/Box'
+import { StyledButtonSecondary } from './styles/Buttons.styled'
+import StyledTextField from './styles/TextField.styled'
+import { setFilter } from '../reducers/filterReducer'
+import NotificationContext from '../context/NotificationContext'
 
 const NoteForm = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const { setNotification } = useContext(NotificationContext)
 
   const setNote = async (event) => {
-    event.preventDefault()
-    const noteContent = event.target.note.value
-    event.target.note.value = ''
-    const newNote = { content: noteContent, important: false }
+    try {
+      event.preventDefault()
+      const noteContent = event.target.note.value
+      event.target.note.value = ''
+      const newNote = { content: noteContent, important: false }
+      const response = await notesServices.create(newNote)
 
-    const response = await notesServices.create(newNote)
-
-    dispatch(addNoteToStore(response))
-    navigate('/')
+      dispatch(addNoteToStore(response))
+      dispatch(setFilter('ALL'))
+      navigate('/notes')
+    } catch (exception) {
+      setNotification({ text: exception, type: 'error' })
+      setTimeout(() => setNotification(null), 5000)
+    }
   }
 
   return (
-    <div className='formDiv'>
-      <h2>Create a new note</h2>
+    <Box className='formDiv' sx={{ marginTop: '20px' }}>
       <form onSubmit={setNote}>
-        <input name='note' placeholder='enter text...' />
-        <button type='submit'>save</button>
-        <br />
-        <button
-          onClick={() => {
-            navigate('/')
-          }}
-        >
-          back to all notes
-        </button>
+        <StyledTextField
+          fullWidth
+          label='Create a new note...'
+          id='fullWidth'
+          name='note'
+          multiline
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <StyledButtonSecondary type='submit'>save</StyledButtonSecondary>
+          <StyledButtonSecondary
+            onClick={() => {
+              navigate('/notes')
+              dispatch(setFilter('ALL'))
+            }}
+          >
+            back to all notes
+          </StyledButtonSecondary>
+        </Box>
       </form>
-    </div>
+    </Box>
   )
 }
 
