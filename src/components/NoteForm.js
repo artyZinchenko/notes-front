@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import notesServices from '../services/notes'
 import { useDispatch } from 'react-redux'
 import { addNoteToStore } from '../reducers/notesReducer'
@@ -10,16 +10,22 @@ import { setFilter } from '../reducers/filterReducer'
 import NotificationContext from '../context/NotificationContext'
 
 const NoteForm = () => {
+  const [showDescription, setShowDescription] = useState(false)
+  const [isSetting, setIsSetting] = useState(false)
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { setNotification } = useContext(NotificationContext)
+  const [noteText, setNoteText] = useState('')
+  const [descriptionText, setDescriptionText] = useState('')
 
   const setNote = async (event) => {
+    event.preventDefault()
+    setIsSetting(true)
     try {
-      event.preventDefault()
-      const noteContent = event.target.note.value
-      event.target.note.value = ''
-      const newNote = { content: noteContent, important: false }
+      const newNote = { content: noteText, important: false }
+
+      if (descriptionText.length > 0) newNote.description = descriptionText
+
       const response = await notesServices.create(newNote)
 
       dispatch(addNoteToStore(response))
@@ -29,6 +35,7 @@ const NoteForm = () => {
       setNotification({ text: exception, type: 'error' })
       setTimeout(() => setNotification(null), 5000)
     }
+    setIsSetting(false)
   }
 
   return (
@@ -39,10 +46,21 @@ const NoteForm = () => {
           label='Create a new note...'
           id='fullWidth'
           name='note'
+          value={noteText}
+          onChange={(e) => {
+            setNoteText(e.target.value)
+          }}
           multiline
         />
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <StyledButtonSecondary type='submit'>save</StyledButtonSecondary>
+          <StyledButtonSecondary type='submit' disabled={isSetting}>
+            save
+          </StyledButtonSecondary>
+          <StyledButtonSecondary
+            onClick={() => setShowDescription(!showDescription)}
+          >
+            {showDescription ? 'hide description' : 'add description'}
+          </StyledButtonSecondary>
           <StyledButtonSecondary
             onClick={() => {
               navigate('/notes')
@@ -52,6 +70,19 @@ const NoteForm = () => {
             back to all notes
           </StyledButtonSecondary>
         </Box>
+        {showDescription && (
+          <StyledTextField
+            fullWidth
+            id='filled-multiline-static'
+            multiline
+            rows={4}
+            variant='filled'
+            label='Optional note description...'
+            name='description'
+            value={descriptionText}
+            onChange={(e) => setDescriptionText(e.target.value)}
+          />
+        )}
       </form>
     </Box>
   )

@@ -8,11 +8,11 @@ import Box from '@mui/system/Box'
 import { StyledButtonMainReverse } from './styles/Buttons.styled'
 import NotificationContext from '../context/NotificationContext'
 
-const ModificationForm = ({ note, setModificationDisplay }) => {
+const ModificationForm = ({ note, setShowModificationForm }) => {
   const dispatch = useDispatch()
   const { setNotification } = useContext(NotificationContext)
 
-  const [text, setText] = useState(`${note.content}`)
+  const [text, setText] = useState(note.content)
   const setNote = async (event) => {
     event.preventDefault()
     const changedNote = {
@@ -23,7 +23,7 @@ const ModificationForm = ({ note, setModificationDisplay }) => {
       const response = await notesServices.update(changedNote.id, changedNote)
 
       dispatch(modifyNote(response))
-      setModificationDisplay(false)
+      setShowModificationForm(false)
     } catch (exception) {
       setNotification({ text: exception, type: 'error' })
       setTimeout(() => setNotification(null), 5000)
@@ -33,6 +33,10 @@ const ModificationForm = ({ note, setModificationDisplay }) => {
   const handleChange = (event) => {
     const newText = event.target.value
     setText(newText)
+  }
+
+  const handleCancel = () => {
+    setShowModificationForm(false)
   }
 
   return (
@@ -48,7 +52,15 @@ const ModificationForm = ({ note, setModificationDisplay }) => {
           multiline
           sx={{ marginBlock: '20px' }}
         />
-        <Box textAlign='right' margin='10px'>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
+          <StyledButtonMainReverse onClick={handleCancel}>
+            Cancel changes
+          </StyledButtonMainReverse>
           <StyledButtonMainReverse type='submit'>
             Save changes
           </StyledButtonMainReverse>

@@ -16,13 +16,15 @@ import { Box } from '@mui/system'
 import { useTheme } from 'styled-components'
 import { Typography } from '@mui/material'
 import NotificationContext from '../context/NotificationContext'
+import Description from './Description'
 
 const DetailedNote = ({ matchedNoteId }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const theme = useTheme()
   const { setNotification } = useContext(NotificationContext)
-  const [modificationDisplay, setModificationDisplay] = useState(false)
+  const [showModificationForm, setShowModificationForm] = useState(false)
+  const [showDescription, setShowDescription] = useState(false)
 
   const note = useSelector((state) => {
     return state.notes.find((el) => el.id === matchedNoteId)
@@ -30,7 +32,7 @@ const DetailedNote = ({ matchedNoteId }) => {
 
   if (!note) return
 
-  const label = note?.important ? 'make not important' : 'make important'
+  const label = note?.important ? 'make unimportant' : 'make important'
 
   const toggleImportanceOf = async (note) => {
     try {
@@ -61,9 +63,9 @@ const DetailedNote = ({ matchedNoteId }) => {
     }
   }
 
-  const toggleModification = (setModificationDisplay) => {
-    const state = !modificationDisplay
-    setModificationDisplay(state)
+  const toggleNoteModification = (setShowModificationForm) => {
+    const state = !showModificationForm
+    setShowModificationForm(state)
   }
 
   const dateOfCreation = new Date(note.date).toLocaleDateString('en-us', {
@@ -76,22 +78,22 @@ const DetailedNote = ({ matchedNoteId }) => {
   return (
     <Box>
       <StyledPaper>
-        {modificationDisplay ? (
+        {showModificationForm ? (
           <ModificationForm
             note={note}
-            setModificationDisplay={setModificationDisplay}
+            setShowModificationForm={setShowModificationForm}
           />
         ) : (
           <div>
             <Typography
-              variant='h4'
+              variant='h6'
               sx={{ color: theme.palette.text.primary, mt: 3 }}
             >
               {note.content}
             </Typography>
             <Box textAlign='right' margin='10px'>
               <StyledButtonMainReverse
-                onClick={() => toggleModification(setModificationDisplay)}
+                onClick={() => toggleNoteModification(setShowModificationForm)}
               >
                 Change note
               </StyledButtonMainReverse>
@@ -101,25 +103,33 @@ const DetailedNote = ({ matchedNoteId }) => {
       </StyledPaper>
       <Box>
         <Box>
-          <StyledButtonSecondary onClick={() => toggleImportanceOf(note)}>
-            {label}
-          </StyledButtonSecondary>{' '}
-          <StyledButtonSecondary onClick={() => deleteNote(note)}>
-            delete
-          </StyledButtonSecondary>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <StyledButtonSecondary onClick={() => toggleImportanceOf(note)}>
+              {label}
+            </StyledButtonSecondary>{' '}
+            <StyledButtonSecondary onClick={() => deleteNote(note)}>
+              delete
+            </StyledButtonSecondary>
+            <StyledButtonSecondary
+              onClick={() => {
+                navigate('/notes')
+                dispatch(setFilter('ALL'))
+              }}
+            >
+              back to notes
+            </StyledButtonSecondary>
+          </Box>
           <p>was created on {dateOfCreation}</p>
-          <p>{note.important}</p>
-          <br />
-        </Box>
-        <Box>
           <StyledButtonSecondary
             onClick={() => {
-              navigate('/notes')
-              dispatch(setFilter('ALL'))
+              setShowDescription(!showDescription)
             }}
           >
-            back to all notes
+            {showDescription ? 'hide description' : 'show description'}
           </StyledButtonSecondary>
+          {showDescription && (
+            <Description note={note} setShowDescription={setShowDescription} />
+          )}
         </Box>
       </Box>
     </Box>

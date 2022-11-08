@@ -35,17 +35,16 @@ const App = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const localStorageUser = localStorage.getItem('loggedNoteappUser')
+  const currentUser = localStorageUser ? JSON.parse(localStorageUser) : null
+
   const [theme, setTheme] = useState('light')
   const [notification, setNotification] = useState(null)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(currentUser)
   const value = { notification, setNotification }
 
   useEffect(() => {
-    const loggedUserJSON = localStorage.getItem('loggedNoteappUser')
-
-    const user = JSON.parse(loggedUserJSON)
     if (user) {
-      setUser(user)
       noteService.setToken(user.token)
     }
   }, [])
@@ -124,7 +123,10 @@ const App = () => {
               theme={theme}
             />
             <Container sx={{ minHeight: '70vh' }}>
-              <Notification notification={notification} />
+              <Notification
+                notification={notification}
+                setNotification={setNotification}
+              />
 
               <Routes>
                 <Route path='/' element={<HomePage user={user} />} />

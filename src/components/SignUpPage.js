@@ -12,29 +12,6 @@ import StyledTextField from './styles/TextField.styled'
 
 import { useTheme } from 'styled-components'
 
-const Copyright = (props) => {
-  const theme = useTheme()
-  return (
-    <Typography
-      variant='body2'
-      color={theme.palette.text.primary}
-      align='center'
-      {...props}
-    >
-      {'github '}
-      <Link
-        color='inherit'
-        target='_blank'
-        href='https://github.com/artyZinchenko/notes-front.git'
-      >
-        Code base
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  )
-}
-
 const SignUp = ({ handleSignup, handleLogin }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -104,7 +81,6 @@ const SignUp = ({ handleSignup, handleLogin }) => {
           </Grid>
         </Box>
       </Box>
-      <Copyright sx={{ mt: 8, mb: 4 }} />
     </Container>
   )
 }

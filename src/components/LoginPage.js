@@ -13,29 +13,6 @@ import { StyledButtonMainReverse } from './styles/Buttons.styled'
 import StyledTextField from './styles/TextField.styled'
 import Grid from '@mui/material/Grid'
 
-function Copyright(props) {
-  const theme = useTheme()
-  return (
-    <Typography
-      variant='body2'
-      color={theme.palette.text.primary}
-      align='center'
-      {...props}
-    >
-      {'github '}
-      <Link
-        color='inherit'
-        target='_blank'
-        href='https://github.com/artyZinchenko/notes-front.git'
-      >
-        Code base
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  )
-}
-
 const LoginPage = ({ handleLogin }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -104,7 +81,6 @@ const LoginPage = ({ handleLogin }) => {
           </Grid>
         </Box>
       </Box>
-      <Copyright sx={{ mt: 8, mb: 4 }} />
     </Container>
   )
 }
