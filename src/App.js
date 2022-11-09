@@ -68,16 +68,17 @@ const App = () => {
     }
   }, [user])
 
-  const handleLogin = async (credentials) => {
+  const handleLogin = async (credentials, afterSignup = false) => {
     try {
       const user = await loginService.login(credentials)
       setUser(user)
       window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
       noteService.setToken(user.token)
-      setNotification({
-        text: `${credentials.username} logged in `,
-        type: 'success',
-      })
+      !afterSignup &&
+        setNotification({
+          text: `${credentials.username} logged in `,
+          type: 'success',
+        })
       setTimeout(() => setNotification(null), 5000)
       navigate('/notes')
     } catch (exception) {
@@ -93,10 +94,13 @@ const App = () => {
         text: `${credentials.username}'s account created `,
         type: 'success',
       })
+
       setTimeout(() => setNotification(null), 5000)
     } catch (exception) {
       setNotification({ type: 'error', text: exception })
       setTimeout(() => setNotification(null), 3000)
+
+      throw exception
     }
   }
 
@@ -114,6 +118,8 @@ const App = () => {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              margin: '0px',
+              padding: '0px',
             }}
           >
             <Header
@@ -122,7 +128,11 @@ const App = () => {
               setTheme={setTheme}
               theme={theme}
             />
-            <Container sx={{ minHeight: '70vh' }}>
+            <Container
+              sx={{
+                minHeight: '70vh',
+              }}
+            >
               <Notification
                 notification={notification}
                 setNotification={setNotification}

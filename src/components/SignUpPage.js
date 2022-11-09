@@ -16,12 +16,18 @@ const SignUp = ({ handleSignup, handleLogin }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const theme = useTheme()
+  const afterSignup = true
 
   const signupUser = async (event) => {
     event.preventDefault()
     const credentials = { username, password }
-    const signupSuccess = await handleSignup(credentials)
-    signupSuccess && (await handleLogin(credentials))
+
+    try {
+      await handleSignup(credentials)
+      await handleLogin(credentials, afterSignup)
+    } catch (exception) {
+      return
+    }
   }
 
   return (

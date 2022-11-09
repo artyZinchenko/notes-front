@@ -15,6 +15,7 @@ const StyledHeader = styled(AppBar)({
   minHeight: '11vh',
   backgroundColor: ({ theme }) => theme.palette.background.header,
   color: ({ theme }) => theme.palette.text.primary,
+  width: '100vw',
   padding: '20px 0',
   '& .css-i4bv87-MuiSvgIcon-root': {
     height: '1em',
@@ -60,11 +61,10 @@ const Header = ({ user, setUser, setTheme, theme }) => {
           }}
         >
           <NoteIcon fontSize='large' />
-          {matches && (
-            <Typography variant='h5' color='#3b82f6'>
-              NotesApp
-            </Typography>
-          )}
+
+          <Typography variant='h5' color='#3b82f6'>
+            NotesApp
+          </Typography>
         </Box>
         <Box
           sx={{
@@ -83,9 +83,15 @@ const Header = ({ user, setUser, setTheme, theme }) => {
                 gap: '20px',
               }}
             >
-              <StyledTypography variant='subtitle1'>
-                {user.username} logged-in
-              </StyledTypography>
+              {matches && (
+                <StyledTypography
+                  variant='subtitle1'
+                  sx={{ overflowWrap: 'break-word', maxWidth: '50vw' }}
+                >
+                  {user.username} logged-in
+                </StyledTypography>
+              )}
+
               <StyledButtonMainReverse
                 onClick={handleLogOut}
                 sx={{ whiteSpace: 'nowrap' }}
