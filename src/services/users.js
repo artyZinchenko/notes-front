@@ -1,6 +1,5 @@
 import axios from 'axios'
-const baseUrl =
-  'https://notes-app-backend-ds8dm82uc-artyzinchenko.vercel.app/api/users'
+const baseUrl = 'https://web-production-7680.up.railway.app/api/users'
 
 const createUser = async (credentials) => {
   const response = await axios.post(baseUrl, credentials)
