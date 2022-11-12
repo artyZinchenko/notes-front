@@ -1,5 +1,5 @@
 import axios from 'axios'
-const baseUrl = 'https://web-production-7680.up.railway.app/api/notes'
+const baseUrl = 'https://notes-app-backend-4ksr.onrender.com/api/notes'
 
 let token = null
 
