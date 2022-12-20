@@ -29,6 +29,7 @@ import { Container } from '@mui/material'
 import HomePage from './components/HomePage'
 import NotificationContext from './context/NotificationContext'
 import SignUp from './components/SignUpPage'
+import CircularModal from './components/CircularModal'
 
 const App = () => {
   const inputGlobalStyles = <GlobalStyles />
@@ -41,6 +42,7 @@ const App = () => {
   const [theme, setTheme] = useState('light')
   const [notification, setNotification] = useState(null)
   const [user, setUser] = useState(currentUser)
+  const [loading, setLoading] = useState(false)
   const value = { notification, setNotification }
 
   useEffect(() => {
@@ -69,6 +71,7 @@ const App = () => {
   }, [user])
 
   const handleLogin = async (credentials, afterSignup = false) => {
+    setLoading(true)
     try {
       const user = await loginService.login(credentials)
       setUser(user)
@@ -84,10 +87,13 @@ const App = () => {
     } catch (exception) {
       setNotification({ type: 'error', text: exception })
       setTimeout(() => setNotification(null), 3000)
+    } finally {
+      setLoading(false)
     }
   }
 
   const handleSignup = async (credentials) => {
+    setLoading(true)
     try {
       await userService.createUser(credentials)
       setNotification({
@@ -101,6 +107,8 @@ const App = () => {
       setTimeout(() => setNotification(null), 3000)
 
       throw exception
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -171,6 +179,7 @@ const App = () => {
                 </Route>
               </Routes>
             </Container>
+            <CircularModal show={loading} />
             <Footer />
           </Box>
         </ThemeProvider>
